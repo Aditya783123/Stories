@@ -1,5 +1,7 @@
 import React from 'react'
 import {StyleSheet, Text, View, Image, TouchableOpacity, ToastAndroid, KeyboardAvoidingView} from 'react-native'
+import {TextInput} from 'react-native-gesture-handler'
+import {Header} from 'react-native elements'
 import * as Permissions from 'expo-permissions'
 import {BarCodeScanner} from 'expo-barcode-scanner'
 import db from '../config'
@@ -24,49 +26,56 @@ export default class WritingScreen extends React.Component{
             storyText:'',
             title:'',
         });
-        ToastAndroid.show('Your Story Has been Submitted!', ToastAndroid.SHORT)
+        ToastAndroid.show('Your Story Has Been Submitted!', ToastAndroid.SHORT)
     };
 
 render(){
     return(
-        <View style={styles.container}>
-            <View>
-                <Text style={{textAlign: 'center', fontSize:30, backgroundColor:'black'}}>StoryHub{''}</Text>
-            </View>
-            <View style={styles.inputView}>
-                <KeyboardAvoidingView>
-            <TextInput
-            style={styles.inputBox}
-            placeholder="Story Title"
-            />
-            </KeyboardAvoidingView>
-            </View>
-            <View style={styles.inputView}>
-            <KeyboardAvoidingView>
-            <TextInput
-            style={styles.inputBox}
-            placeholder="Author Name"
-            />
-            </KeyboardAvoidingView>
-            </View>
-            <KeyboardAvoidingView>
-            <TextInput 
-            style={styles.storyBox}
-            placeholder="Write Your Story!"
-            />
-            </KeyboardAvoidingView>
-            <TouchableOpacity
-            style={styles.submitButton}
-            onPress={this.submitStory}>
-              <Text style={styles.submitButtonText}>Submit Your Story!</Text>
-            </TouchableOpacity>
-            <View style={styles.inputView}>
-            
-            <TextInput/>
-                </View>
-        </View>
+        <KeyBoardAvoidingView style={styles.container} behavior="padding" enabled>
+           <Header 
+           backgroundColor={'red'}
+           centerComponent={{
+               text:'The Bedtime Story Place',
+               style:{color:'white', fontSize:20}
+           }}
+           />
+           <TextInput
+           placeholder="Author Of The Story"
+           onChangeText={(text)=>{
+               this.setState({
+                   author:text
+               })
+           }}
+           value={this.state.author}
+           style={styles.author}/>
+           <TextInput
+           placeholder="Title Of The Story"
+           onChangeText={(text)=>{
+               this.setState({
+                   title:text
+               })
+           }}
+           value={this.state.title}
+           style={styles.title}/>
+           <TextInput
+           placeholder="What Happens In The Story?"
+           onChangeText={(text)=>{
+               this.setState({
+                   storyText:text
+               })
+           }}
+           value={this.state.storyText}
+           style={styles.storyText}
+           multiline={true}/>
+           <TouchableOpacity
+           style={styles.submitButton}
+           onPress={this.submitStory}
+           >
+              <Text style={styles.buttonText}>Submit</Text>
+           </TouchableOpacity>
+        </KeyBoardAvoidingView>
     )
-}
+    }
 }
 const styles=StyleSheet.create({
     container:{

@@ -1,18 +1,104 @@
 import React from 'react'
 import {StyleSheet, Text, View, Header} from 'react-native'
+import {SearchBar, Header} from 'react-native-elements'
+import db from'../config'
 
 export default class ReadingScreen extends React.Component{
+    constructor(){
+        super();
+        this.state={
+            allStories:[],
+            dataSource:[],
+            search:''
+        }
+    }
+    componentDidMount(){
+        this.retrieveStories()
+    }
+    updateSearch=search=>{
+        this.setState({search});
+    }
+
+    retrieveStories=()=>{
+        try{
+            var allStories=[]
+            var stories = db.collection("stories").get().then((querySnapshot)=>{
+                querySnapshot.forEach((doc)=>{
+                    allStories.push(doc.data())
+                    console.log('these are the stories', allStories)
+                })
+                this.setState({allStories})
+            });
+        }
+        catch(error){
+            console.log(error)
+        }
+    };
+
+    SearchFilterFunction(text){
+        const newData=this.state.allStories.filter((item)=>{
+            const itemData=item.title ? item.title.toUpperCase():''.toUpperCase();
+            const textData=text.toUpperCase();
+            return itemData.indexOf(textData)>-1
+        });
+        this.setState({
+            dataSource:newData,
+            search:text
+        })
+    }
     render(){
         return(
-            <View style={{flex:1, justifyContent:'center', alignItems:'center'}}> <Text style={styles.header}>Read an Incredibly Detailed Story!</Text>
-            <Text styles={styles.text}>
-                You are reading a story. (What, did you expect more?)
-            </Text>
-            </View>
+           <View style={styles.container}>
+               <Header
+                  backgroundColor={'pink'}
+                  centerComponent={{
+                      text:'Bed Time Stories',
+                      style:{color:'white', fontSize:20}
+                  }}
+               />
+               <View styles={{height:20,width:'100%'}}>
+                   <SearchBar
+                     placeholder="Type Here..."
+                     onChangeText={text=>this.SearchFilterFunction(text)}
+                     onClear={text=>this.SearchFilterFunction('')}
+                     value={this.state.search}
+                   />
+               </View>
+               <FlatList
+                     data={this.state.search === "" ? this.state.allStories:this.state.dataSource}
+                     renderItem={({item})=>(
+                         <View>
+                             <Text>Title:{item.title}</Text>
+                             <Text>Author:{item.author}</Text>
+                         </View>    
+                     )}
+                     keyExtractor={(item, index)=>index.toString}
+               />
+           </View>
         );
     }
 }
 const styles=StyleSheet.create({
+    container:{
+       backgroundColor:'#fff'
+    },
+    item:{
+       backgroundColor:'pink',
+       padding:10,
+       marginVertical:8,
+       marginHorizontal:16,
+    },
+    title:{
+       fontSize:32,
+    },
+    itemContainer:{
+        height:80,
+        width:'100%',
+        borderWidth:2,
+        borderColor:'pink',
+        kustifyContent:'center',
+        alignSelf:'center'
+    },
     text:{
         flex:1,
         fontWeight:'bold',
